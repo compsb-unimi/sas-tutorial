@@ -229,7 +229,7 @@ CPPFLAGS: Specifies preprocessor flags:
 --enable-af_cuda: Enables ArrayFire CUDA support.
 --verbose: Enables verbose output during the configuration process.
 ```
-Build and install PLUMED.
+Build and install PLUMED:
 ```
 make && make install
 ```
@@ -241,7 +241,7 @@ To prevent compatibility issues caused by exporting the stub library, completely
 #!/bin/bash
 #SBATCH --job-name=PLUMED_AF
 #SBATCH -N 1                
-#SBATCH --ntasks-per-node=1 #
+#SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8  
 #SBATCH --gres=gpu:1       
 #SBATCH -o OUT.log
