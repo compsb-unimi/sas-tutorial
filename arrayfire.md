@@ -13,8 +13,6 @@ To install ArrayFire, certain dependencies are required. Often, these dependenci
 ``` 
 module avail
 ```
+For a comprehensive list of requirements and additional installation suggestions, please visit the [official ARRAYFIRE GitHub page](https://github.com/arrayfire/arrayfire/wiki/Build-Instructions-for-Linux).
 
-```bash 
-module avail
-```
 
