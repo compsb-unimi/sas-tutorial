@@ -1,4 +1,4 @@
-# Compiling PLUMED with ARRAYFIRE support
+# Installing PLUMED2 with ARRAYFIRE support
 The purpose of this tutorial is to guide the user step by step through the process of compiling PLUMED with ARRAYFIRE, an open-source library that supports a wide range of hardware accelerators for parallel computing.
 
 In this specific case, the library is used to take advantage of CUDA-based GPUs to speed up the SAS calculation (ATOMISTIC / MARTINI / PARAMETERS / ONEBEAD representations). Furthermore, in order to show a limit case, the installation will be performed on Leonardo, an HPC hosted by CINECA and managed by the SLURM scheduler.
@@ -13,7 +13,7 @@ To install ArrayFire, certain dependencies are required. Often, these dependenci
 ``` 
 module avail
 ```
-For a comprehensive list of requirements and additional installation suggestions, please visit the [official ARRAYFIRE GitHub page](https://github.com/arrayfire/arrayfire/wiki/Build-Instructions-for-Linux). Continuing with the Leonardo example, here is the list of basic modules that can be inserted directly into the shell:
+For a comprehensive list of requirements and additional installation suggestions, please visit the [official ARRAYFIRE GitHub page](https://github.com/arrayfire/arrayfire/wiki/Build-Instructions-for-Linux). Continuing with the Leonardo example, here is the list of basic modules that can should be loaded directly from the shell:
 ``` 
 module load profile/lifesc
 module load gmp/6.2.1
@@ -27,7 +27,7 @@ module load cblas/2015-06-06--gcc--11.3.0
 module load gsl/2.7.1--gcc--11.3.0
 module load cuda/11.8
 ```
-Additional dependencies are available on Leonardo, but for general purposes will be installed manually in the next steps. It is assumed that downloads are stored in the home folder.
+Additional dependencies are available on Leonardo, but for general purposes will be installed manually in the next steps. It is assumed that the downloads are stored in the home folder.
 
 ## 2. Building dependencies from source
 Let's start by creating a folder where all the codes will be installed:
@@ -64,6 +64,10 @@ Compile and install the source code:
 ```
 make && make install
 ```
+In case of slowdowns, specify the number of processors to use, in this case 8:
+```
+make -j 8
+```
 Move to the fftw-3.3.10 folder and configure new instructions with the 64-bit floating point support:
 ```
 ./configure --prefix=$HOME/build/fftw/ --enable-shared CFLAGS="-march=native" --enable-avx2 --enable-sse2
@@ -76,7 +80,7 @@ Set the LD_LIBRARY_PATH environment variable directly in the shell:
 ```
 export LD_LIBRARY_PATH="$HOME/build/fftw/lib/:$LD_LIBRARY_PATH"
 ```
-### BOOST
+### Boost
 Download the "Boost C++" libraries version 1.85.0:
 ``` 
 wget https://boostorg.jfrog.io/artifactory/main/release/1.85.0/source/boost_1_85_0.tar.gz
@@ -102,4 +106,175 @@ Add the Boost library path to the LD_LIBRARY_PATH and the include path to the PA
 export PATH="$HOME/boost/include/:$PATH"
 export LD_LIBRARY_PATH="$HOME/build/boost/lib/:$LD_LIBRARY_PATH"
 ```
-### SPDLOG
+### Spdlog
+Clone and move into the spdlog repository:
+```
+git clone https://github.com/gabime/spdlog.git
+cd spdlog
+```
+Checkout the specific version v1.9.2:
+```
+git checkout v1.9.2
+```
+Create build directory and navigate into it:
+```
+mkdir build && cd build
+```
+Run CMake to configure the build:
+```
+cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/build/spdlog -DSPDLOG_BUILD_SHARED=ON
+```
+Compile and install the source code:
+```
+make && make install
+```
+Set the environment variables:
+```
+export PATH="$HOME/build/spdlog/include/:$PATH"
+export LD_LIBRARY_PATH="$HOME/build/spdlog/lib64/:$LD_LIBRARY_PATH"
+```
+### Link to libcuda library
+The next step can be tricky as it involves identifying a specific CUDA library on the cluster and linking it to your home directory. Since the installation occurs on the login node, the CUDA drivers are not directly available during code compilation. Therefore, the stub library `libcuda.so` must be found on the HPC system. If the location is not clear, use the following command to find it:
+```
+find / -name libcuda.so 2>/dev/null
+```
+For Leonardo, the `libcuda.so` compatible with toolkit version 11.8 is located at:
+```
+/leonardo/prod/opt/compilers/cuda/11.8/none/lib64/stubs/libcuda.so
+```
+Create a folder in your home directory to link the library:
+```
+mkdir $HOME/libs && cd $HOME/libs
+```
+Link the library:
+```
+ln -s /leonardo/prod/opt/compilers/cuda/11.8/none/lib64/stubs/libcuda.so libcuda.so.1
+```
+Update the LD_LIBRARY_PATH environment variable:
+```
+export LD_LIBRARY_PATH="$HOME/libs/:$LD_LIBRARY_PATH"
+```
+## 3. Building and installing ArrayFire from source
+Clone the ArrayFire repository:
+```
+git clone --recursive https://github.com/arrayfire/arrayfire.git
+```
+Checkout the specific version (v3.9.0):
+```
+git checkout v3.9.0
+```
+Create a build directory and navigate into it:
+```
+mkdir build && cd build
+```
+Configure the build system with CMake:
+```
+cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/build/arrayfire -DAF_BUILD_OPENCL=OFF -DAF_BUILD_CPU=OFF -DAF_BUILD_CUDA=ON -DAF_BUILD_FORGE=OFF -DFFTW_INCLUDE_DIR=$HOME/build/fftw/include -DFFTWF_LIBRARY=$HOME/build/fftw/lib/libfftw3f.so -DFFTW_LIBRARY=$HOME/build/fftw/lib/libfftw3.so -DBoost_DIR=$HOME/build/boost -DBoost_INCLUDE_DIR=$HOME/build/boost/include -DCUDA_TOOLKIT_ROOT_DIR=/leonardo/prod/opt/compilers/cuda/11.8/none -DNVPRUNE=/leonardo/prod/opt/compilers/cuda/11.8/none/bin/nvprune -Dspdlog_DIR=$HOME/build/spdlog/lib64/cmake/spdlog
+```
+Configuration details:
+```
+-DCMAKE_INSTALL_PREFIX=$HOME/build/arrayfire: Specifies the installation directory for ArrayFire.
+-DAF_BUILD_OPENCL=OFF: Disables the OpenCL backend.
+-DAF_BUILD_CPU=OFF: Disables the CPU backend.
+-DAF_BUILD_CUDA=ON: Enables the CUDA backend.
+-DAF_BUILD_FORGE=OFF: Disables the Forge library build.
+-DFFTW_INCLUDE_DIR=$HOME/build/fftw/include: Specifies the directory containing the FFTW include files.
+-DFFTWF_LIBRARY=$HOME/build/fftw/lib/libfftw3f.so: Specifies the single-precision FFTW library.
+-DFFTW_LIBRARY=$HOME/build/fftw/lib/libfftw3.so: Specifies the double-precision FFTW library.
+-DBoost_DIR=$HOME/build/boost: Specifies the directory containing Boost.
+-DBoost_INCLUDE_DIR=$HOME/build/boost/include: Specifies the Boost include directory.
+-DCUDA_TOOLKIT_ROOT_DIR=/leonardo/prod/opt/compilers/cuda/11.8/none: Specifies the CUDA toolkit root directory.
+-DNVPRUNE=/leonardo/prod/opt/compilers/cuda/11.8/none/bin/nvprune: Specifies the path to the nvprune tool.
+-Dspdlog_DIR=$HOME/build/spdlog/lib64/cmake/spdlog: Specifies the directory containing the spdlog CMake configuration files.
+```
+Build and install ArrayFire:
+```
+make && make install
+```
+Check that `libafcuda.so` is correctly built, all the required shared libraries must be resolved:
+```
+ldd $HOME/build/arrayfire/lib64/libafcuda.so
+```
+Update the LD_LIBRARY_PATH environment variable:
+```
+export LD_LIBRARY_PATH="$HOME/build/arrayfire/lib64/:$LD_LIBRARY_PATH"
+```
+## 4. Installing PLUMED2 with ArrayFire support
+Clone the PLUMED repository:
+```
+git clone --recursive https://github.com/plumed/plumed2.git
+```
+Navigate to the PLUMED directory:
+```
+cd plumed2
+```
+Configure the build system:
+```
+./configure --prefix=$HOME/build/plumed CC=mpicc CXX=mpicxx --enable-modules=all --enable-asmjit --enable-fftw LDFLAGS="-L$HOME/build/arrayfire/lib64/ -Wl,-rpath,$HOME/build/arrayfire/lib64/ -L$HOME/build/fftw/lib/ -Wl,-rpath,$HOME/build/fftw/lib/" CPPFLAGS="-I$HOME/build/arrayfire/include -I$HOME/build/fftw/include" --enable-af_cuda --verbose
+```
+Configuration details:
+```
+CC=mpicc CXX=mpicxx: Specifies the MPI compilers to use.
+--enable-modules=all: Enables all PLUMED modules.
+--enable-asmjit: Enables the AsmJit library.
+--enable-fftw: Enables FFTW support.
+LDFLAGS: Specifies linker flags:
+-L$HOME/build/arrayfire/lib64/: Adds the ArrayFire library directory to the linker search path.
+-Wl,-rpath,$HOME/build/arrayfire/lib64/: Adds the ArrayFire library directory to the runtime library search path.
+-L$HOME/build/fftw/lib/: Adds the FFTW library directory to the linker search path.
+-Wl,-rpath,$HOME/build/fftw/lib/: Adds the FFTW library directory to the runtime library search path.
+CPPFLAGS: Specifies preprocessor flags:
+-I$HOME/build/arrayfire/include: Adds the ArrayFire include directory to the compiler search path.
+-I$HOME/build/fftw/include: Adds the FFTW include directory to the compiler search path.
+--enable-af_cuda: Enables ArrayFire CUDA support.
+--verbose: Enables verbose output during the configuration process.
+```
+Build and install PLUMED.
+```
+make && make install
+```
+## 5. Logout & login
+To prevent compatibility issues caused by exporting the stub library, completely logout of the HPC shell and perform a clean login. Avoiding this step could result in CUDA device native identification errors.
+
+## 6. write & run the SBATCH script
+```
+#!/bin/bash
+#SBATCH --job-name=PLUMED_AF
+#SBATCH -N 1                
+#SBATCH --ntasks-per-node=1 #
+#SBATCH --cpus-per-task=8  
+#SBATCH --gres=gpu:1       
+#SBATCH -o OUT.log
+
+### MODULES ###
+module load profile/lifesc
+module load gmp/6.2.1
+module load mpfr/4.1.0
+module load mpc/1.2.1
+module load gcc/11.3.0
+module load zlib/1.2.13--gcc--11.3.0
+module load openmpi/4.1.4--gcc--11.3.0-cuda-11.8
+module load openblas/0.3.21--gcc--11.3.0
+module load cblas/2015-06-06--gcc--11.3.0
+module load gsl/2.7.1--gcc--11.3.0
+module load cuda/11.8
+
+### DEPENDENCIES ###
+export LD_LIBRARY_PATH="$HOME/build/fftw/lib/:$LD_LIBRARY_PATH"
+export PATH="$HOME/build/boost/include/:$PATH"
+export LD_LIBRARY_PATH="$HOME/boost/lib/:$LD_LIBRARY_PATH"
+export PATH="$HOME/build/spdlog/include/:$PATH"
+export LD_LIBRARY_PATH="$HOME/build/spdlog/lib64/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$HOME/build/arrayfire/lib64/:$LD_LIBRARY_PATH"
+
+### PLUMED ###
+export PATH="$HOME/build/plumed/bin:$PATH"
+export LD_LIBRARY_PATH="$HOME/build/plumed/lib/:$LD_LIBRARY_PATH"
+export PKG_CONFIG_PATH="$HOME/build/plumed/lib/pkgconfig/:$PKG_CONFIG_PATH"
+export PLUMED_KERNEL="$HOME/build/plumed/lib/libplumedKernel.so"
+
+export PLUMED_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+### CMD ###
+plumed driver --plumed plumed.dat --mf_xtc trj.xtc
+```
