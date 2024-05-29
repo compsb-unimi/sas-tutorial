@@ -1,11 +1,11 @@
 # Installing PLUMED2 with ARRAYFIRE support
-The purpose of this tutorial is to guide the user step by step through the process of compiling PLUMED with ARRAYFIRE, an open-source library that supports a wide range of hardware accelerators for parallel computing.
+The purpose of this tutorial is to guide the user step-by-step through the process of compiling and installing PLUMED with ARRAYFIRE, an open-source library that supports a wide range of hardware accelerators for parallel computing.
 
-In this specific case, the library is used to take advantage of CUDA-based GPUs to speed up the SAS calculation (ATOMISTIC / MARTINI / PARAMETERS / ONEBEAD representations). Furthermore, in order to show a limit case, the installation will be performed on Leonardo, an HPC hosted by CINECA and managed by the SLURM scheduler.
+In this specific case, the library is used to take advantage of CUDA-based GPUs to speed up the SAS calculation (ATOMISTIC / MARTINI / PARAMETERS / ONEBEAD representations). Furthermore, in order to show a real-life limit case, the installation will be performed on Leonardo, an HPC hosted by CINECA and managed by the SLURM scheduler.
 
 In this specific scenario, the library is used to take advantage of CUDA-based GPUs to speed up the SAS calculation (ATOMISTIC / MARTINI / PARAMETERS / ONEBEAD representations). Furthermore, in order to show a real-life limit case, the installation will be performed on Leonardo, an HPC hosted by CINECA and managed by the SLURM scheduler.
 
-To keep the working environment clean and compatible with other setups, the modules are not automatically loaded via .bashrc/.bash_aliases, but are invoked during installation and then managed via the SBATCH script used to submit jobs on the HPC.
+To keep the working environment clean and compatible with other setups, in this guide the modules are not automatically loaded via .bashrc/.bash_aliases, but are invoked during installation and then managed via the batch script used to submit jobs on the HPC.
 
 ## 1. Loading essential modules
 
@@ -27,7 +27,7 @@ module load cblas/2015-06-06--gcc--11.3.0
 module load gsl/2.7.1--gcc--11.3.0
 module load cuda/11.8
 ```
-Additional dependencies are available on Leonardo, but for general purposes will be installed manually in the next steps. It is assumed that the downloads are stored in the home folder.
+Other required modules are available from Leonardo, but for general purposes and to provide useful examples, the other dependencies will be installed manually in the next steps. It is assumed that the downloads are stored in the home folder.
 
 ## 2. Building dependencies from source
 Let's start by creating a folder where all the codes will be installed:
@@ -134,7 +134,7 @@ export PATH="$HOME/build/spdlog/include/:$PATH"
 export LD_LIBRARY_PATH="$HOME/build/spdlog/lib64/:$LD_LIBRARY_PATH"
 ```
 ### Link to libcuda library
-The next step can be tricky as it involves identifying a specific CUDA library on the cluster and linking it to your home directory. Since the installation occurs on the login node, the CUDA drivers are not directly available during code compilation. Therefore, the stub library `libcuda.so` must be found on the HPC system. If the location is not clear, use the following command to find it:
+The next step can be tricky as it involves identifying a specific CUDA library on the cluster and linking it to your home directory. As the installation takes place on the login node, the CUDA drivers may not be directly available during code compilation. As an alternative, the stub library `libcuda.so` must be found on the HPC system. If the location is not clear, use the following command to find it:
 ```
 find / -name libcuda.so 2>/dev/null
 ```
@@ -234,11 +234,21 @@ Build and install PLUMED:
 make && make install
 ```
 ## 5. Logout & login
-To prevent compatibility issues caused by exporting the stub library, completely logout of the HPC shell and perform a clean login. Avoiding this step could result in CUDA device native identification errors.
+To prevent compatibility issues caused by exporting the stub library, completely logout of the HPC shell and perform a clean login. Avoiding this step could result in "CUDA device native identification" errors.
 
-## 6. write & run the SBATCH script
+## 6. Write & run the SLURM batch script
+Create a SLURM batch file, e.g. `RUN.sh`, using a text editor:
+```
+vim RUN.sh
+```
+Set the job configuration, the modules, the environment variables and run the PLUMED driver command:
 ```
 #!/bin/bash
+
+#SBATCH -A _PROJECT_
+#SBATCH -p _PARTITION_
+#SBATCH --time HH:MM:SS
+
 #SBATCH --job-name=PLUMED_AF
 #SBATCH -N 1                
 #SBATCH --ntasks-per-node=1
@@ -278,3 +288,11 @@ export PLUMED_NUM_THREADS=$SLURM_CPUS_PER_TASK
 ### CMD ###
 plumed driver --plumed plumed.dat --mf_xtc trj.xtc
 ```
+In this example, the plumed command launches the driver to analyse the molecular dynamics trajectory `trj.xtc` according to the `plumed.dat` file. For the details regarding the `plumed.dat`instructions, refer to the other modules of this guide.
+
+Run the SLURM script file:
+```
+sbatch `run.sh`
+```
+## 7. Final notes
+This guide was written and verified in May 2024, using the latest version of PLUMED available at that time. The names, paths, and versions of the modules can vary between HPC systems. Even for Leonardo, a software stack update might make this guide partially incompatible. However, all provided examples should offer a broad logic to customize and adapt the installation on local machines or other HPC systems
