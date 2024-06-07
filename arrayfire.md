@@ -70,6 +70,7 @@ make -j 8
 ```
 Move to the fftw-3.3.10 folder and configure new instructions with the 64-bit floating point support:
 ```
+cd ../fftw-3.3.10
 ./configure --prefix=$HOME/build/fftw/ --enable-shared CFLAGS="-march=native" --enable-avx2 --enable-sse2
 ```
 Compile and install the source code:
@@ -81,7 +82,7 @@ Set the LD_LIBRARY_PATH environment variable directly in the shell:
 export LD_LIBRARY_PATH="$HOME/build/fftw/lib/:$LD_LIBRARY_PATH"
 ```
 ### Boost
-Download the "Boost C++" libraries version 1.85.0:
+Return to the download folder. Download the "Boost C++" libraries version 1.85.0:
 ``` 
 wget https://boostorg.jfrog.io/artifactory/main/release/1.85.0/source/boost_1_85_0.tar.gz
 ```
@@ -107,7 +108,7 @@ export PATH="$HOME/boost/include/:$PATH"
 export LD_LIBRARY_PATH="$HOME/build/boost/lib/:$LD_LIBRARY_PATH"
 ```
 ### Spdlog
-Clone and move into the spdlog repository:
+Return to the download folder. Clone and move into the spdlog repository:
 ```
 git clone https://github.com/gabime/spdlog.git
 cd spdlog
@@ -155,12 +156,13 @@ Update the LD_LIBRARY_PATH environment variable:
 export LD_LIBRARY_PATH="$HOME/libs/:$LD_LIBRARY_PATH"
 ```
 ## 3. Building and installing ArrayFire from source
-Clone the ArrayFire repository:
+Return to the download folder. Clone the ArrayFire repository:
 ```
 git clone --recursive https://github.com/arrayfire/arrayfire.git
 ```
-Checkout the specific version (v3.9.0):
+Move into the arrayfire directory and checkout the specific version (v3.9.0):
 ```
+cd arrayfire
 git checkout v3.9.0
 ```
 Create a build directory and navigate into it:
