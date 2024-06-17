@@ -1,2 +1,17 @@
-# hySAS readme
-PLUMED2 SAXS-ISDB module instructions and tutorials
+# README
+This guide is designed to provide users with practical advice on using the hySAS module. For theoretical information about the method, please refer to the related manuscript (link). The guide is divided into several sections:
+
+#### hySAS Intro & Overview
+A brief introduction to the method, basic concepts, and an overview of the analyses that can be performed.
+
+#### Determining the Scattering Profile with hySAS
+From coordinates to a SAS curve: steps and examples to analyse a PDB file or a trajectory.
+
+#### Generating a Conformational Ensemble with GMX and hySAS
+Combining GROMACS and PLUMED to generate conformational ensembles restrained by SAS data using different coupling methods.
+
+#### Preparing the Input Files
+Guidelines and tips for preparing the input files.
+
+#### Compiling PLUMED with ARRAYFIRE Support
+Compiling and installing software can be challenging. Here are some technical suggestions and a real-case example of installing PLUMED with ARRAYFIRE support on a SLURM-based HPC.
