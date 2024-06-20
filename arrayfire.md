@@ -296,5 +296,69 @@ Run the SLURM script file:
 ```
 sbatch RUN.sh
 ```
-## 7. Final notes
+
+## 7. Running GROMACS with PLUMED support
+Besides analyzing a PDB or an MD trajectory with the driver, it is possible to generate a conformational ensemble that agrees with SAS data using an MD engine. To enable this feature in GROMACS, it must be patched with the plumed-patch module and compiled with MPI support. Here is an example of a SLURM script that, after loading dependencies and environment variables, launches GROMACS with PLUMED support::
+
+```
+#!/bin/bash
+
+#SBATCH -A _PROJECT_
+#SBATCH -p _PARTITION_
+#SBATCH --time HH:MM:SS
+
+#SBATCH --job-name="hysas_metainference"
+#SBATCH -o OUT.log
+
+#SBATCH -N 1
+#SBATCH --ntasks-per-node=4
+#SBATCH --cpus-per-task=8
+#SBATCH --gres=gpu:4
+#SBATCH -o OUT.log
+
+### MODULES ###
+module load profile/lifesc
+module load gmp/6.2.1
+module load mpfr/4.1.0
+module load mpc/1.2.1
+module load gcc/11.3.0
+module load zlib/1.2.13--gcc--11.3.0
+module load openmpi/4.1.4--gcc--11.3.0-cuda-11.8
+module load openblas/0.3.21--gcc--11.3.0
+module load cblas/2015-06-06--gcc--11.3.0
+module load gsl/2.7.1--gcc--11.3.0
+module load cuda/11.8
+
+### DEPENDENCIES ###
+export LD_LIBRARY_PATH="$HOME/build/fftw/lib/:$LD_LIBRARY_PATH"
+export PATH="$HOME/build/boost/include/:$PATH"
+export LD_LIBRARY_PATH="$HOME/boost/lib/:$LD_LIBRARY_PATH"
+export PATH="$HOME/build/spdlog/include/:$PATH"
+export LD_LIBRARY_PATH="$HOME/build/spdlog/lib64/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$HOME/build/arrayfire/lib64/:$LD_LIBRARY_PATH"
+
+### PLUMED ###
+export PATH="$HOME/build/plumed/bin:$PATH"
+export LD_LIBRARY_PATH="$HOME/build/plumed/lib/:$LD_LIBRARY_PATH"
+export PKG_CONFIG_PATH="$HOME/build/plumed/lib/pkgconfig/:$PKG_CONFIG_PATH"
+export PLUMED_KERNEL="$HOME/build/plumed/lib/libplumedKernel.so"
+
+### GROMACS ###
+source $HOME/build/gmx24_mpi/bin/GMXRC
+
+### EXPORT ###
+export OMP_PROC_BIND=true
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+### CMD ###
+MPIRUN=$(which mpirun)
+MDRUN=$(which gmx_mpi)
+NP=`expr $SLURM_JOB_NUM_NODES \* $SLURM_NTASKS_PER_NODE`
+
+$MPIRUN -np $NP --map-by socket $MDRUN mdrun -v -deffnm replica -pin on -ntomp $SLURM_CPUS_PER_TASK -nsteps -1 -dlb yes -nb gpu -bonded gpu -pme gpu -plumed ../plumed.dat -multidir 0 1 2 3 -cpi replica.cpt -maxh 23.9
+```
+
+In this example a single node is dedicated to perform a multidir simulation of 4 replicas, one for each GPU.
+
+## 8. Final notes
 This guide was written and verified in June 2024, using the latest version of PLUMED available at that time. The names, paths, and versions of the modules can vary between HPC systems. Even for Leonardo, a software stack update might make this guide partially incompatible. However, all provided examples should offer a broad logic to customize and adapt the installation on local machines or other HPC systems.

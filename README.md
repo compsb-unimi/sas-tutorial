@@ -1,5 +1,5 @@
 # README
-This guide is designed to provide users with practical advice on using the hySAS module. For theoretical information about the method, please refer to the related manuscript (link). The guide is divided into several sections:
+This guide is designed to provide users with practical advice on using the hySAS module. For theoretical information about the method, please refer to the related [manuscript](https://pubs.acs.org/doi/full/10.1021/acs.jctc.3c00864). The guide is divided into several sections:
 
 #### hySAS Intro & Overview
 A brief introduction to the method, basic concepts, and an overview of the analyses that can be performed.
