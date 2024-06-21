@@ -1,11 +1,9 @@
 # Installing PLUMED2 with ARRAYFIRE support
 The purpose of this tutorial is to guide the user step-by-step through the process of compiling and installing PLUMED with ARRAYFIRE, an open-source library that supports a wide range of hardware accelerators for parallel computing.
 
-In this specific case, the library is used to take advantage of CUDA-based GPUs to speed up the SAS calculation (ATOMISTIC / MARTINI / PARAMETERS / ONEBEAD representations). Furthermore, in order to show a real-life limit case, the installation will be performed on Leonardo, an HPC hosted by CINECA and managed by the SLURM scheduler.
+In this specific scenario, the library is used to take advantage of CUDA-based GPUs to speed up the SAS calculation (ATOMISTIC / MARTINI / PARAMETERS / ONEBEAD representations). Furthermore, in order to show a real-life limit case, this installation example is performed on Leonardo, an HPC hosted by CINECA and managed by the SLURM scheduler.
 
-In this specific scenario, the library is used to take advantage of CUDA-based GPUs to speed up the SAS calculation (ATOMISTIC / MARTINI / PARAMETERS / ONEBEAD representations). Furthermore, in order to show a real-life limit case, the installation will be performed on Leonardo, an HPC hosted by CINECA and managed by the SLURM scheduler.
-
-To keep the working environment clean and compatible with other setups, in this guide the modules are not automatically loaded via .bashrc/.bash_aliases, but are invoked during installation and then managed via the batch script used to submit jobs on the HPC.
+To keep the working environment clean and compatible with other setups, in this guide the modules are not automatically loaded via .bashrc, .bash_aliases, or other configuration files, but are invoked during installation and then managed via the SLURM batch script used to submit jobs to the HPC.
 
 ## 1. Loading essential modules
 
@@ -13,7 +11,7 @@ To install ArrayFire, certain dependencies are required. Often, these dependenci
 ``` 
 module avail
 ```
-For a comprehensive list of requirements and additional installation suggestions, please visit the [official ARRAYFIRE GitHub page](https://github.com/arrayfire/arrayfire/wiki/Build-Instructions-for-Linux). Continuing with the Leonardo example, here is the list of basic modules that can should be loaded directly from the shell:
+For a comprehensive list of requirements and additional installation suggestions, please visit the [official ARRAYFIRE GitHub page](https://github.com/arrayfire/arrayfire/wiki/Build-Instructions-for-Linux). Continuing with the Leonardo example, here is the list of basic modules that can be loaded directly from the shell:
 ``` 
 module load profile/lifesc
 module load gmp/6.2.1
@@ -113,7 +111,7 @@ Return to the download folder. Clone and move into the spdlog repository:
 git clone https://github.com/gabime/spdlog.git
 cd spdlog
 ```
-Checkout the specific version v1.9.2:
+Checkout the specific version 1.9.2:
 ```
 git checkout v1.9.2
 ```
@@ -290,7 +288,7 @@ export PLUMED_NUM_THREADS=$SLURM_CPUS_PER_TASK
 ### CMD ###
 plumed driver --plumed plumed.dat --mf_xtc trj.xtc
 ```
-In this example, the plumed command launches the driver to analyse the molecular dynamics trajectory `trj.xtc` according to the `plumed.dat` file. For the details regarding the `plumed.dat`instructions, refer to the other modules of this guide.
+In this example, the plumed command launches the driver to analyse the molecular dynamics trajectory `trj.xtc` according to the `plumed.dat` file. For the details regarding the `plumed.dat`instructions, refer to the Tutorial 1 of this guide.
 
 Run the SLURM script file:
 ```
@@ -298,7 +296,7 @@ sbatch RUN.sh
 ```
 
 ## 7. Running GROMACS with PLUMED support
-Besides analyzing a PDB or an MD trajectory with the driver, it is possible to generate a conformational ensemble that agrees with SAS data using an MD engine. To enable this feature in GROMACS, it must be patched with the plumed-patch module and compiled with MPI support. Here is an example of a SLURM script that, after loading dependencies and environment variables, launches GROMACS with PLUMED support::
+In addition to analysing a PDB or MD trajectory with the driver, it is possible to generate a conformational ensemble that agrees with SAS data using an MD engine. To enable this feature in GROMACS, it must be patched with the plumed-patch module and compiled with MPI support. Here is an example of a SLURM script that, after loading dependencies and environment variables, launches GROMACS with PLUMED support:
 
 ```
 #!/bin/bash

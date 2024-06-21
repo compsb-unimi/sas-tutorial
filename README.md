@@ -14,4 +14,4 @@ Combining GROMACS and PLUMED to generate conformational ensembles restrained by 
 Guidelines and tips for preparing the input files.
 
 #### Compiling PLUMED with ARRAYFIRE Support
-Compiling and installing software can be challenging. Here are some technical suggestions and a real-case example of installing PLUMED with ARRAYFIRE support on a SLURM-based HPC.
+Technical suggestions and a real-case example for installing PLUMED with ARRAYFIRE support on a SLURM-based HPC.

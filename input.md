@@ -11,7 +11,11 @@ The MOLINFO PDB must start with ATOM number 1. The residue number can start with
 #### 4. Providing the same file to MOLINFO and TEMPLATE
 It is possible to provide MOLINFO and TEMPLATE with the same PDB, taking into account all three points above.
 #### 5. PDB format
-The naming conventions for atoms and residues can vary depending on the forcefield or software used. This variability, particularly in the case of nucleic acids, is a major limitation in the hySAS mapping process. In addition to calculating the Solvent-Accessible Surface Area, which is necessary to introduce the solvation layer contribution or the hydrogen-deuterium exchange, it is essential to detect the residue and analyse the atoms belonging to a bead in order to define its centre of mass. This is used to locate the centre of the bead and this position has a major impact on the final SAS profile calculation. For this reason, as a preliminary step, each bead type and atom composition is verified. In order to perform this process, it is not feasible to consider all possible atom and residue names.
+The naming conventions for atoms and residues can vary depending on the force field or software used. This variability, particularly in the case of nucleic acids, is a major limitation in the hySAS mapping process. Detecting the residue type and analysing the atoms belonging to a bead is essential to:
+* calculate the Solvent-Accessible Surface Area, required to introduce the solvation layer contribution or the hydrogen-deuterium exchange (SANS only);
+* calculate the bead centre of mass, used to define the centre of the bead, a feature which has a major influence on the final SAS profile calculation.
+
+For these reasons, as a preliminary step, each bead type and atom composition is verified. In order to perform this process, it is not feasible to consider all possible atom and residue names.
 
 ##### Amino acids
 
