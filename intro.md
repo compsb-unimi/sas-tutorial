@@ -19,3 +19,5 @@ Some additional features are introduced specifically for SANS. It is possible to
 As well as generating a conformational ensemble or refining a structure, it is possible to use the forward model to calculate the SAS profile from a PDB or a trajectory using the PLUMED driver.
 
 For additional information, please refer to the related [manuscript](https://pubs.acs.org/doi/full/10.1021/acs.jctc.3c00864).
+
+##### [Back to hySAS home](NAVIGATION.md)
