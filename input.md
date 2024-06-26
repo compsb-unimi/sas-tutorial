@@ -94,3 +94,5 @@ For practical purposes, the table below lists all DNA/RNA atom names accepted fo
 | Pentose Bead Atoms                  | Nucleobase Bead Atoms                   | PO Bead Atoms     |
 |-------------------------------------|-----------------------------------------|-------------------|
 | O5', C5', O4', C4', O3', C3', O2', C2', C1', H5', H5'', H4', H3', H2', H2'', H2'2, H1', HO5', HO3', HO2', H5'1, H5'2, HO'2, H2'1, H5T, H3T. | N1, N2, N3, N4, N6, N7, N9, C2, C4, C5, C6, C7, C8, O2, O4, O6, H1, H2, H3, H5, H6, H8, H21, H22, H41, H42, H61, H62, H71, H72, H73. | P, OP1, OP2, OP3, O1P, O2P, O3P, HP, HOP3. |
+
+##### [Back to hySAS home](NAVIGATION.md)

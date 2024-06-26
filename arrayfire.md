@@ -360,3 +360,5 @@ In this example a single node is dedicated to perform a multidir simulation of 4
 
 ## 8. Final notes
 This guide was written and verified in June 2024, using the latest version of PLUMED available at that time. The names, paths, and versions of the modules can vary between HPC systems. Even for Leonardo, a software stack update might make this guide partially incompatible. However, all provided examples should offer a broad logic to customize and adapt the installation on local machines or other HPC systems.
+
+##### [Back to Home](NAVIGATION.md)
