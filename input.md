@@ -7,7 +7,7 @@ Warning: If a residue is included in the SAS calculation, all corresponding atom
 #### 2. Consistency between MOLINFO and the molfile
 When using the plumed driver, the supplied molfile (PDB, XTC, ...) to be analysed must be consistent with the PDB provided in MOLINFO. Specifically, there must be the same number of atoms in the same order.
 #### 3. MOLINFO PDB numbering
-The MOLINFO PDB must start with ATOM number 1. The residue number can start with a number other than 1.
+The MOLINFO PDB must start with ATOM number 1. The residue number can start with a positive number other than 1.
 #### 4. Providing the same file to MOLINFO and TEMPLATE
 It is possible to provide MOLINFO and TEMPLATE with the same PDB, taking into account all three points above.
 #### 5. PDB format
