@@ -32,7 +32,7 @@ pdb4amber -i original_DNA.pdb -o DNA_amber.pdb -d -v --add-missing-atoms
 Warning: The `-d` `--add-missing-atoms` flags combination adds the hydrogen atoms to the PDB even if they already exist with a different nomenclature. This means that this step could double the number of atoms in the PDB. A solution could be to remove the original hydrogens from the PDB allowing the script to add them again with the correct nomenclature. Note that the order of the atoms in the MOLINFO and TEMPLATE PDBs, as well as in a previously generated trajectory to be analysed with the driver, must be consistent.
 
 Alternatively, the LEaP script, also part of the AmberTools suite, can convert the PDB. Here is a quick step-by-step guide:
-* ##### RNA
+##### RNA
 create a `leapRNA.in` file:
 ```
 vim leapRNA.in
@@ -55,9 +55,9 @@ Command details:
 
 Run LEaP:
 ```
-tleap -s -f leapDNA.in
+tleap -s -f leapRNA.in
 ```
-* ##### DNA
+##### DNA
 create a `leapDNA.in` file:
 ```
 vim leapDNA.in
